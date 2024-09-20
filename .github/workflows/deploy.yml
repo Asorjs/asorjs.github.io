@@ -1,0 +1,33 @@
+name: Deploy to GitHub Pages
+
+on:
+  push:
+    branches:
+      - main  # O la rama que uses como principal
+
+jobs:
+  build-and-deploy:
+    runs-on: ubuntu-latest
+
+    steps:
+      - name: Checkout Repository
+        uses: actions/checkout@v3
+
+      - name: Setup Node.js
+        uses: actions/setup-node@v3
+        with:
+          node-version: '16'  # Ajusta según tu versión de Node.js
+
+      - name: Install Dependencies
+        run: npm install
+
+      - name: Build VitePress Site
+        run: npm run build  # Asegúrate de que este script existe en package.json
+
+      - name: Deploy to GitHub Pages
+        uses: peaceiris/actions-gh-pages@v3
+        with:
+          github_token: ${{ secrets.GITHUB_TOKEN }}
+          publish_dir: ./docs/.vitepress/dist  # Ruta a la carpeta de construcción
+          # Opcional: Configurar el dominio personalizado si lo tienes
+          # cname: yourcustomdomain.com
