@@ -3,5 +3,5 @@ node_modules
 .env
 .env.test
 .cache
-dist/
+<!-- dist/ -->
 .idea
