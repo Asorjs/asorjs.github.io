@@ -29,6 +29,8 @@ export default defineConfig({
     sidebar: [
       {
         text: 'Introduction',
+        collapsible: true,
+        collapsed: true,
         items: [
           { text: 'What is Asor?', link: '/guide/introduction' },
           { text: 'Concepts', link: '/guide/core-concepts' },
@@ -38,6 +40,8 @@ export default defineConfig({
 
       {
         text: 'Directives',
+        collapsible: true,
+        collapsed: false,
         items: [
           { text: 'a-bind', link: '/directives/a-bind' },
           { text: 'a-confirm', link: '/directives/a-confirm' },
@@ -59,9 +63,11 @@ export default defineConfig({
           { text: 'a-transition', link: '/directives/a-transition' },
         ]
       },
-
+      
       {
         text: 'Methods',
+        collapsible: true,
+        collapsed: true,
         items: [
           { text: '$dispatch', link: '/methods/$dispatch' },
           { text: '$event', link: '/methods/$event' },
