@@ -1,0 +1,78 @@
+// src/core/index.ts
+import {
+  DEFINE_EMIT,
+  escapeKey,
+  generateTransform,
+  HELPER_PREFIX,
+  isCallOf,
+  MagicStringAST,
+  parseSFC,
+  walkAST
+} from "@vue-macros/common";
+var EMIT_VARIABLE_NAME = `${HELPER_PREFIX}emit`;
+function transformDefineEmit(code, id) {
+  if (!code.includes(DEFINE_EMIT)) return;
+  const { scriptSetup, getSetupAst } = parseSFC(code, id);
+  if (!scriptSetup) return;
+  const offset = scriptSetup.loc.start.offset;
+  const s = new MagicStringAST(code);
+  const setupAst = getSetupAst();
+  const emits = [];
+  walkAST(setupAst, {
+    enter(node, parent) {
+      if (!isCallOf(node, DEFINE_EMIT)) return;
+      const [name, validator] = node.arguments;
+      let emitName;
+      if (!name) {
+        if (parent?.type !== "VariableDeclarator" || parent.id.type !== "Identifier") {
+          throw new Error(
+            `A variable must be used to receive the return value of ${DEFINE_EMIT}.`
+          );
+        }
+        emitName = parent.id.name;
+      } else if (name.type !== "StringLiteral") {
+        throw new Error(
+          `The first argument of ${DEFINE_EMIT} must be a string literal.`
+        );
+      } else {
+        emitName = name.value;
+      }
+      emits.push({
+        name: emitName,
+        validator: validator ? s.sliceNode(validator, { offset }) : void 0
+      });
+      s.overwriteNode(
+        node,
+        `(...args) => ${EMIT_VARIABLE_NAME}(${JSON.stringify(
+          emitName
+        )}, ...args)`,
+        { offset }
+      );
+    }
+  });
+  if (emits.length > 0) {
+    s.prependLeft(
+      offset,
+      `
+const ${EMIT_VARIABLE_NAME} = defineEmits(${mountEmits()})
+`
+    );
+  }
+  return generateTransform(s, id);
+  function mountEmits() {
+    const isAllWithoutOptions = emits.every(({ validator }) => !validator);
+    if (isAllWithoutOptions) {
+      return `[${emits.map(({ name }) => JSON.stringify(name)).join(", ")}]`;
+    }
+    return `{
+      ${emits.map(
+      ({ name, validator }) => `${escapeKey(name)}: ${validator || `null`}`
+    ).join(",\n  ")}
+    }`;
+  }
+}
+
+export {
+  EMIT_VARIABLE_NAME,
+  transformDefineEmit
+};
