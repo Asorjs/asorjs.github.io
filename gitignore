@@ -1,5 +1,7 @@
 node_modules
-scratch.md
+.DS_Store
+.env
+.env.test
+.cache
 dist/
-.env.json
 .idea
