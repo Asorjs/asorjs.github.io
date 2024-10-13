@@ -7,17 +7,17 @@ The `a-for` directive is used to render a list of elements based on an array.
 ### Basic Syntax
 
 ```html
-<element a-for="item in items"></element>
+<template a-for="item in items"></template>
 ```
 
 ### Usage Example
 
 ```html
-<div a-def="{ fruits: ['Apple', 'Banana', 'Cherry'] }">
-    <ul a-for="fruit in fruits">
-        <li :text="fruit"></li>
-    </ul>
-</div>
+<ul a-def="{ fruits: ['Apple', 'Banana', 'Cherry'] }">
+    <template a-for="fruit in fruits">
+      <li :text="fruit"></li>
+    </template>
+</ul>
 ```
 
 ### Accessing the Index
@@ -25,90 +25,140 @@ The `a-for` directive is used to render a list of elements based on an array.
 You can access the index of the current item using the following syntax:
 
 ```html
-<div a-def="{ users: [{name: 'Anna'}, {name: 'Bob'}, {name: 'Charlie'}] }">
-    <ul a-for="(user, index) in users">
-        <li>
-            <span :text="index"></span>:
-            <span :text="user.name"></span>
-        </li>
-    </ul>
-</div>
+<ul a-def="{ users: [{name: 'Anna'}, {name: 'Bob'}, {name: 'Charlie'}] }">
+  <template a-for="(user, index) in users">
+    <li>
+      <span :text="index"></span>:
+      <span :text="user.name"></span>
+    </li>
+  </template>
+</ul>
 ```
 
-### Ejemplo con Array
+### Example with Array
 
 ```html
-<div a-def=" fruits: ['Manzana', 'Banana', 'Cereza'] ">
-  <ul a-for="fruit in fruits">
+<ul a-def="{ fruits: ['Manzana', 'Banana', 'Cereza'] }">
+  <template a-for="fruit in fruits">
     <li :text="fruit"></li>
-  </ul>
-</div>
+  </template>
+</ul>
 ```
 
-Este ejemplo generará una lista no ordenada con un elemento para cada fruta en el array.
+This example will generate an unordered list with one element for each fruit in the array.
 
-## Acceso al Índice
+## Access to the Index
 
-Puedes acceder al índice del elemento actual en la iteración:
+You can access the index of the current element in the iteration:
 
 ```html
-<div a-def="{ users: ['Alice', 'Bob', 'Charlie'] }">
-  <ul a-for="(user, index) in users">
+<ul a-def="{ users: ['Alice', 'Bob', 'Charlie'] }">
+  <template a-for="(user, index) in users">
     <li :text="`${index + 1}. ${user}`"></li>
-  </ul>
-</div>
+  </template>
+</ul>
 ```
 
-## Iteración sobre Objetos
-
-`a-for` también puede iterar sobre las propiedades de un objeto:
+or directly, index is a constant in the direct a-for:
 
 ```html
-<div a-def="{ user: { name: 'Juan', age: 30, city: 'Madrid' } }">
-  <ul a-for="(value, key) in user">
-    <li  :text="`${key}: ${value}`"> </li>
-  </ul>
-</div>
+<ul a-def="{ users: ['Alice', 'Bob', 'Charlie'] }">
+  <template a-for="user in users">
+    <li :text="`${index + 1}. ${user}`"></li>
+  </template>
+</ul>
 ```
 
-## Renderizado Condicional en Listas
+## Iteration on Objects
 
-Puedes combinar `a-for` con `a-if` para filtrar elementos:
+`a-for` can also iterate over the properties of an object:
 
 ```html
-<div a-def="{ tasks: [
+<ul a-def="{ user: { name: 'Juan', age: 30, city: 'Madrid' } }">
+  <template a-for="(value, key) in user">
+    <li :text="`${key}: ${value}`"></li>
+  </template>
+</ul>
+```
+
+## Conditional Rendering in Lists
+
+You can combine `a-for` with `a-if` to filter elements:
+
+```html
+<ul
+  a-def="{ tasks: [
   { id: 1, text: 'Tarea 1', completed: false },
   { id: 2, text: 'Tarea 2', completed: true },
-  { id: 3, text: 'Tarea 3', completed: false }
-] }">
-  <ul a-for="task in tasks" >
+  { id: 3, text: 'Tarea 3', completed: false } ] 
+  }"
+>
+  <template a-for="task in tasks">
     <li a-if="!task.completed" :text="task.text"></li>
-  </ul>
-</div>
+  </template>
+</ul>
 ```
 
-Este ejemplo solo mostrará las tareas no completadas.
+This example will only show uncompleted tasks.
 
-## Manejo de Eventos en Listas
+## List Event Management
 
-Puedes adjuntar manejadores de eventos a elementos dentro de un bucle:
+You can attach event handlers to elements within a loop:
 
 ```html
-<div a-def="{
+<ul
+  a-def="{
     items: ['Item 1', 'Item 2', 'Item 3', 'Item 4'],
     removeItem(index) {
         this.items = this.items.filter((_, i) => i !== index);
     }
-}">
-    <ul a-for="(item, index) in items" >
-        <li>
-            <span :text="item"></span>
-            <button @click="removeItem(index)">Eliminar</button>
-        </li>
-    </ul>
-</div>
+}"
+>
+  <template a-for="(item, index) in items">
+    <li>
+      <span :text="item"></span>
+      <button @click="removeItem(index)">Eliminar</button>
+    </li>
+  </template>
+</ul>
+```
+
+### Iterating over a range
+
+If you need to simply loop n number of times, rather than iterate through an array, Alpine offers a short syntax.
+
+```html
+<ul>
+    <template a-for="i in 10">
+        <li :text="i"></li>
+    </template>
+</ul>
+```
+
+i in this case can be named anything you like.
+
+### Contents of a `<template>`
+
+As mentioned above, a `<template>` tag must contain only one root element.
+
+For example, the following code will not work:
+
+```html
+<template a-for="color in colors">
+    <span>The next color is </span><span :text="color"></span>
+</template>
+```
+
+but this code will work:
+
+```html
+<template a-for="color in colors">
+    <p>
+        <span>The next color is </span><span :text="color"></span>
+    </p>
+</template>
 ```
 
 ### Considerations
 
--   Ensure that the array is defined in `a-def` before using it with `a-for`.
+- Ensure that the array is defined in `a-def` before using it with `a-for`.
