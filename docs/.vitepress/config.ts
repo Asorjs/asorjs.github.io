@@ -5,6 +5,9 @@ export default defineConfig({
   title: "Asor framework",
   description: "Documentation for the Asor JavaScript framework",
   lang: 'en-US',
+  head: [
+    ['link', { rel: 'icon', type: 'image/png', href: '/logo.png' }]
+  ],
   
   locales: {
     root: {
@@ -76,7 +79,20 @@ export default defineConfig({
           { text: '$persist', link: '/methods/$persist' },
           { text: '$root', link: '/methods/$root' },
         ]
+      },
+
+      {
+        text: 'Globals',
+        collapsible: true,
+        collapsed: true,
+        items: [
+          { text: 'Asor.component()', link: '/globals/Asor.component' },
+          { text: 'Asor.store()', link: '/globals/Asor.store' },
+        ]
       }
+
+
+
 
     ],
 
